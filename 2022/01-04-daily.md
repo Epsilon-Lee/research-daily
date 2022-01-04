@@ -7,9 +7,21 @@
 - [Gradient Cached Dense Passage Retrieval](https://github.com/luyug/GC-DPR), this approach could increase in-batch negatives far beyond GPU RAM limitations.
 - [DPR-scale](https://github.com/facebookresearch/dpr-scale), from facebook, corresponding to [this](https://arxiv.org/abs/2107.13602) paper.
 
+
+
 ### Understand training details of `DPR` `FiD` etc.
 
-#### FiD and FiD for distillation
+#### Runing DPR
+
+```bash
+python train_dense_encoder.py \
+  train_datasets=[nq_train] \
+  dev_datasets=[nq_dev] \
+  train=biencoder_local \
+  output_dir={path to checkpoints dir}
+```
+
+#### Running FiD and FiD for distillation
 
 - [FiD Repo](https://github.com/facebookresearch/FiD).
 - `get-data.sh`: as said in the above repo's readme file, this bash script *"In addition to the question and answers, this script retrieves the Wikipedia passages used to trained the released pretrained models."*
@@ -26,18 +38,29 @@ NQ_test = select_examples_NQ(originaldev, NQ_idx['test'], passages, NQ_passages[
 CODE=/home/cqduan/workspace/odqa/FiD
 DATA=/home/cqduan/workspace/odqa/FiD/open_domain_data/NQ
 EXP=/home/cqduan/workspace/odqa/FiD_experiment
-python $CODE/train_reader.py \
+EXP_NAME=Jan_4_multigpu
+# python $CODE/train_reader.py \
+CUDA_VISIBLE_DEVICES=4,5,6,7 python -m torch.distributed.launch --nproc_per_node=$NGPU $CODE/train_reader.py \
   --train_data $DATA/train.json \
   --eval_data  $DATA/dev.json \
   --model_size base \
   --per_gpu_batch 1 \
   --n_context 100 \
-  --name $EXP \
-  --checkpoint_dir $EXP/checkpoint \
+  --name $EXP_NAME \
+  --use_checkpoint \
+  --lr 0.00005 \
+  --optim adamw \
+  --scheduler linear \
+  --weight_decay 0.01 \
+  --text_maxlength 250 \
+  --total_step 15000 \
+  --warmup_step 1000 \
+  --eval_freq 500 \
+  --local_rank 0 \
+#  --checkpoint_dir $EXP/checkpoint \
 ```
 
 - When running the above script, several following errors should be resolved.
-- 
 ```bash
 
 # HuggingFace Transformer package
