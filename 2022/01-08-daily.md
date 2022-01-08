@@ -11,6 +11,12 @@ The first paper is called [Learning in High Dimension Always Amounts to Extrapol
 > **Interpolation**.
 > *Interpolation occurs for a sample x whenever this sample falls inside or on the boundary of the given dataset's convex hull.*
 
-> **Extrapolation_
-> 
-> Extrapolation occurs when x falls outside the given dataset's convex hull.
+> **Extrapolation**
+> *Extrapolation occurs when x falls outside the given dataset's convex hull.*
+
+This paper handles the following two common (mis)conceptions:
+
+- sota algorithm work so well because of their ability to correctly interpolate training data
+- interpolation happens throughout tasks and datasets
+
+via their empirical and theretic obersations that: *on any high dimensional (>100) dataset, interpolation almost surely never happens*.
